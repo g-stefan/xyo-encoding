@@ -1,0 +1,16 @@
+// Encoding
+// Copyright (c) 2022 Grigore Stefan <g_stefan@yahoo.com>
+// MIT License (MIT) <http://opensource.org/licenses/MIT>
+// SPDX-FileCopyrightText: 2022 Grigore Stefan <g_stefan@yahoo.com>
+// SPDX-License-Identifier: MIT
+
+#ifndef XYO_ENCODING_COPYRIGHT_RH
+#define XYO_ENCODING_COPYRIGHT_RH
+
+#define XYO_ENCODING_COPYRIGHT "Copyright (c) 2022 Grigore Stefan"
+#define XYO_ENCODING_PUBLISHER "Grigore Stefan"
+#define XYO_ENCODING_COMPANY XYO_ENCODING_PUBLISHER
+#define XYO_ENCODING_CONTACT "g_stefan@yahoo.com"
+#define XYO_ENCODING_FULL_COPYRIGHT XYO_ENCODING_COPYRIGHT " <" XYO_ENCODING_CONTACT ">"
+
+#endif

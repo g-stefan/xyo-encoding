@@ -1,0 +1,11 @@
+// Encoding
+// Copyright (c) 2022 Grigore Stefan <g_stefan@yahoo.com>
+// MIT License (MIT) <http://opensource.org/licenses/MIT>
+// SPDX-FileCopyrightText: 2022 Grigore Stefan <g_stefan@yahoo.com>
+// SPDX-License-Identifier: MIT
+
+#include <XYO/Encoding/Library.rh>
+#include <XYO/Encoding/Copyright.rh>
+#include <XYO/Encoding/Version.rh>
+
+XYO_APPLICATION_VERSION_INFO(XYO_ENCODING,"xyo-encoding.dll","XYO Encoding")
