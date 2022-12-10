@@ -13,7 +13,6 @@ namespace XYO::Encoding::Copyright {
 	static const char *publisher_ = XYO_ENCODING_PUBLISHER;
 	static const char *company_ = XYO_ENCODING_COMPANY;
 	static const char *contact_ = XYO_ENCODING_CONTACT;
-	static const char *fullCopyright_ = XYO_ENCODING_FULL_COPYRIGHT;
 
 	const char *copyright() {
 		return copyright_;
@@ -29,10 +28,6 @@ namespace XYO::Encoding::Copyright {
 
 	const char *contact() {
 		return contact_;
-	};
-
-	const char *fullCopyright() {
-		return fullCopyright_;
 	};
 
 };

@@ -16,7 +16,6 @@ namespace XYO::Encoding::Copyright {
 	XYO_ENCODING_EXPORT const char *publisher();
 	XYO_ENCODING_EXPORT const char *company();
 	XYO_ENCODING_EXPORT const char *contact();
-	XYO_ENCODING_EXPORT const char *fullCopyright();
 };
 
 #endif

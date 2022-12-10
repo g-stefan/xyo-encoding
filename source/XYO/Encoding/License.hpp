@@ -13,8 +13,7 @@
 
 namespace XYO::Encoding::License {
 
-	XYO_ENCODING_EXPORT const char *licenseHeader();
-	XYO_ENCODING_EXPORT const char *licenseBody();
+	XYO_ENCODING_EXPORT const char *license();
 	XYO_ENCODING_EXPORT const char *shortLicense();
 
 };
