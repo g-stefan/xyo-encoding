@@ -4,7 +4,7 @@
 // SPDX-FileCopyrightText: 2022 Grigore Stefan <g_stefan@yahoo.com>
 // SPDX-License-Identifier: MIT
 
-#include <XYO/Encoding/utfstream.hpp>
+#include <XYO/Encoding/UTFStream.hpp>
 
 namespace XYO::Encoding {
 
