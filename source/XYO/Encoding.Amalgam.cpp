@@ -12,6 +12,7 @@
 // -
 
 #include <XYO/Encoding/UTF.cpp>
+#include <XYO/Encoding/UTFStream.cpp>
 
 // --
 
