@@ -24,6 +24,8 @@
 #endif
 namespace XYO::Encoding {
 
+	// Byte-order encoding used is little-endian for UTF16 and UTF32
+
 	typedef TStringCore<utf8> StringUTF8Core;
 	typedef TStringReference<utf8> StringUTF8Reference;
 	typedef TString<utf8> StringUTF8;
