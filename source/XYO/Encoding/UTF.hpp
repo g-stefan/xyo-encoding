@@ -29,14 +29,17 @@ namespace XYO::Encoding {
 	typedef TStringCore<utf8> StringUTF8Core;
 	typedef TStringReference<utf8> StringUTF8Reference;
 	typedef TString<utf8> StringUTF8;
+	typedef TStringX<utf8> StringUTF8X;
 
 	typedef TStringCore<utf16> StringUTF16Core;
 	typedef TStringReference<utf16> StringUTF16Reference;
 	typedef TString<utf16> StringUTF16;
+	typedef TStringX<utf16> StringUTF16X;
 
 	typedef TStringCore<utf32> StringUTF32Core;
 	typedef TStringReference<utf32> StringUTF32Reference;
 	typedef TString<utf32> StringUTF32;
+	typedef TStringX<utf32> StringUTF32X;
 
 	namespace UTF {
 		using namespace XYO::DataStructures;

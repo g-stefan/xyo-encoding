@@ -7,6 +7,7 @@
 	],
 	"files.associations": {
 		"new": "cpp",
-		"*.rh": "cpp"
+		"*.rh": "cpp",
+		"xstring": "cpp"
 	}
 }

@@ -20,6 +20,7 @@
 #include <XYO/Encoding/TStringReference.hpp>
 #include <XYO/Encoding/THex.hpp>
 #include <XYO/Encoding/TString.hpp>
+#include <XYO/Encoding/TStringX.hpp>
 #include <XYO/Encoding/String.hpp>
 
 // --
