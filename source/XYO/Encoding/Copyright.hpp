@@ -12,10 +12,10 @@
 #endif
 
 namespace XYO::Encoding::Copyright {
-	XYO_ENCODING_EXPORT std::string copyright();
-	XYO_ENCODING_EXPORT std::string publisher();
-	XYO_ENCODING_EXPORT std::string company();
-	XYO_ENCODING_EXPORT std::string contact();
+	XYO_ENCODING_EXPORT const char *copyright();
+	XYO_ENCODING_EXPORT const char *publisher();
+	XYO_ENCODING_EXPORT const char *company();
+	XYO_ENCODING_EXPORT const char *contact();
 };
 
 #endif
