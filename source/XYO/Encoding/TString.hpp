@@ -414,17 +414,17 @@ namespace XYO::Encoding {
 				return *this;
 			};
 
-			inline TString substring(size_t start, size_t length) {
-				if (length == 0) {
+			inline TString substring(size_t start, size_t length_) {
+				if (length_ == 0) {
 					return TString();
 				};
 				if (start > length()) {
 					return TString();
 				};
-				if (start + length > length()) {
-					length = length() - start;
+				if (start + length_ > length()) {
+					length_ = length() - start;
 				};
-				return TString(index(start), length);
+				return TString(index(start), length_);
 			};
 
 			inline TString substring(size_t start) {
