@@ -327,7 +327,7 @@ namespace XYO::Encoding {
 
 			// ---
 
-			inline TString trimWithElement(const TString &x) {
+			inline TString trimWithElement(const TString &x) const {
 				const T *x1;
 				const T *x2;
 				x1 = TStringCore<T>::toNotInElement(*this, x);
@@ -344,7 +344,7 @@ namespace XYO::Encoding {
 				return TString(x1, x2 - x1 + 1);
 			};
 
-			inline TString trimAscii() {
+			inline TString trimAscii() const {
 				const T *x1;
 				const T *x2;
 				const T x[5] = {0x20, 0x09, 0x0D, 0x0A, 0x00};
@@ -362,7 +362,7 @@ namespace XYO::Encoding {
 				return TString(x1, x2 - x1 + 1);
 			};
 
-			inline TString replace(const TString &x, const TString &y) {
+			inline TString replace(const TString &x, const TString &y) const {
 				TStringReference<T> *retV;
 				size_t k, ln;
 				size_t xLn;
@@ -398,7 +398,7 @@ namespace XYO::Encoding {
 				return retV;
 			};
 
-			inline TString nilAtFirst(const TString &x) {
+			inline TString nilAtFirst(const TString &x) const {
 				size_t idx;
 				if (TStringCore<T>::indexOf(*this, x, idx)) {
 					return TString(*this, idx);
@@ -406,7 +406,7 @@ namespace XYO::Encoding {
 				return *this;
 			};
 
-			inline TString nilAtFirstFromEnd(const TString &x) {
+			inline TString nilAtFirstFromEnd(const TString &x) const {
 				size_t idx;
 				if (TStringCore<T>::indexOfFromEnd(*this, x, idx)) {
 					return TString(*this, idx);
@@ -414,7 +414,7 @@ namespace XYO::Encoding {
 				return *this;
 			};
 
-			inline TString substring(size_t start, size_t length_) {
+			inline TString substring(size_t start, size_t length_) const {
 				if (length_ == 0) {
 					return TString();
 				};
@@ -427,14 +427,14 @@ namespace XYO::Encoding {
 				return TString(index(start), length_);
 			};
 
-			inline TString substring(size_t start) {
+			inline TString substring(size_t start) const {
 				if (start > length()) {
 					return TString();
 				};
 				return TString(index(start), length() - start);
 			};
 
-			inline TString toLowerCaseAscii() {
+			inline TString toLowerCaseAscii() const {
 				TStringReference<T> *retV = TMemory<TStringReference<T>>::newMemory();
 
 				retV->init(length());
@@ -457,7 +457,7 @@ namespace XYO::Encoding {
 				return retV;
 			};
 
-			inline TString toUpperCaseAscii() {
+			inline TString toUpperCaseAscii() const {
 				TStringReference<T> *retV = TMemory<TStringReference<T>>::newMemory();
 
 				retV->init(length());
@@ -481,11 +481,11 @@ namespace XYO::Encoding {
 				return retV;
 			};
 
-			inline bool matchAscii(const TString &sig) {
+			inline bool matchAscii(const TString &sig) const {
 				return TStringCore<T>::matchAscii(*this, length(), sig, sig.length());
 			};
 
-			inline bool split2(const TString &sig, TString &firstPart, TString &secondPart) {
+			inline bool split2(const TString &sig, TString &firstPart, TString &secondPart) const {
 				size_t index;
 				if (TStringCore<T>::indexOf(*this, length(), sig, sig.length(), 0, index)) {
 					firstPart = substring(0, index);
@@ -497,7 +497,7 @@ namespace XYO::Encoding {
 				return false;
 			};
 
-			inline bool split2FromEnd(const TString &sig, TString &firstPart, TString &secondPart) {
+			inline bool split2FromEnd(const TString &sig, TString &firstPart, TString &secondPart) const {
 				size_t index;
 				if (TStringCore<T>::indexOfFromEnd(*this, length(), sig, sig.length(), 0, index)) {
 					firstPart = substring(0, index);
@@ -509,7 +509,7 @@ namespace XYO::Encoding {
 				return false;
 			};
 
-			inline void encodeC_(TStringReference<T> *retV) {
+			inline void encodeC_(TStringReference<T> *retV) const {
 				size_t k;
 				const T *scan;
 				scan = value();
@@ -554,7 +554,7 @@ namespace XYO::Encoding {
 				};
 			};
 
-			inline TString encodeC() {
+			inline TString encodeC() const {
 				TStringReference<T> *retV = TMemory<TStringReference<T>>::newMemory();
 				retV->init();
 				retV->concatenateX('"');
@@ -563,38 +563,38 @@ namespace XYO::Encoding {
 				return retV;
 			};
 
-			inline TString encodeCX() {
+			inline TString encodeCX() const {
 				TStringReference<T> *retV = TMemory<TStringReference<T>>::newMemory();
 				retV->init();
 				encodeC_(retV);
 				return retV;
 			};
 
-			inline bool indexOf(const TString &b, size_t start, size_t &index) {
+			inline bool indexOf(const TString &b, size_t start, size_t &index) const {
 				return TStringCore<T>::indexOf(*this, length(), b, b.length(), start, index);
 			};
 
-			inline bool indexOfFromEnd(const TString &b, size_t start, size_t &index) {
+			inline bool indexOfFromEnd(const TString &b, size_t start, size_t &index) const {
 				return TStringCore<T>::indexOfFromEnd(*this, length(), b, b.length(), start, index);
 			};
 
-			inline bool itContains(const TString &b) {
+			inline bool itContains(const TString &b) const {
 				size_t index = 0;
 				return TStringCore<T>::indexOf(*this, length(), b, b.length(), 0, index);
 			};
 
-			inline bool beginWith(const TString &b) {
+			inline bool beginWith(const TString &b) const {
 				return (TStringCore<T>::compareN(*this, b, b.length()) == 0);
 			};
 
-			inline bool endsWith(const TString &b) {
+			inline bool endsWith(const TString &b) const {
 				if (b.length() > length()) {
 					return false;
 				};
 				return (TStringCore<T>::compareN(index(length() - b.length()), b, b.length()) == 0);
 			};
 
-			inline bool explode(const TString &delimiter, TDynamicArray<TString> &out) {
+			inline bool explode(const TString &delimiter, TDynamicArray<TString> &out) const {
 				size_t index = 0;
 				size_t indexNext = 0;
 				if (delimiter.isEmpty()) {
@@ -614,7 +614,7 @@ namespace XYO::Encoding {
 				return true;
 			};
 
-			static inline TString implode(const TString &delimiter, TDynamicArray<TString> &in) {
+			static inline TString implode(const TString &delimiter, TDynamicArray<TString> &in) const {
 				TString retV;
 				size_t k;
 				if (in.length() < 1) {
