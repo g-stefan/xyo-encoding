@@ -15,7 +15,7 @@ namespace XYO::Encoding {
 
 	typedef TStringCore<char> StringCore;
 	typedef TStringReference<char> StringReference;
-	typedef TString<char> String;	
+	typedef TString<char> String;
 
 };
 

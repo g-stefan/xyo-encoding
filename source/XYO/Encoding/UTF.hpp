@@ -28,11 +28,11 @@ namespace XYO::Encoding {
 
 	typedef TStringCore<utf8> StringUTF8Core;
 	typedef TStringReference<utf8> StringUTF8Reference;
-	typedef TString<utf8> StringUTF8;	
+	typedef TString<utf8> StringUTF8;
 
 	typedef TStringCore<utf16> StringUTF16Core;
 	typedef TStringReference<utf16> StringUTF16Reference;
-	typedef TString<utf16> StringUTF16;	
+	typedef TString<utf16> StringUTF16;
 
 	typedef TStringCore<utf32> StringUTF32Core;
 	typedef TStringReference<utf32> StringUTF32Reference;

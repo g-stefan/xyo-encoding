@@ -627,7 +627,6 @@ namespace XYO::Encoding {
 				};
 				return retV;
 			};
-
 	};
 };
 
