@@ -509,7 +509,7 @@ namespace XYO::Encoding {
 				return false;
 			};
 
-			static inline void encodeC_(TStringReference<T> *retV) {
+			inline void encodeC_(TStringReference<T> *retV) {
 				size_t k;
 				const T *scan;
 				scan = value();
