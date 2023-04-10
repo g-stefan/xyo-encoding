@@ -11,6 +11,10 @@
 #	include <XYO/Encoding/TStringReference.hpp>
 #endif
 
+#ifndef XYO_ENCODING_THEX_HPP
+#	include <XYO/Encoding/THex.hpp>
+#endif
+
 namespace XYO::Encoding {
 
 	using namespace XYO::DataStructures;
