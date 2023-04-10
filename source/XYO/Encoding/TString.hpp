@@ -614,7 +614,7 @@ namespace XYO::Encoding {
 				return true;
 			};
 
-			static inline TString implode(const TString &delimiter, TDynamicArray<TString> &in) const {
+			static inline TString implode(const TString &delimiter, TDynamicArray<TString> &in) {
 				TString retV;
 				size_t k;
 				if (in.length() < 1) {
