@@ -320,6 +320,310 @@ namespace XYO::Encoding {
 			inline bool isEmpty() const {
 				return (length() == 0);
 			};
+
+			// ---
+
+			inline TString trimWithElement(const TString &x) {
+				const T *x1;
+				const T *x2;
+				x1 = TStringCore<T>::toNotInElement(*this, x);
+				x2 = TStringCore<T>::toNotInFromEndElement(*this, x);
+
+				if (*x1 == 0) {
+					return x1;
+				};
+
+				if (*x2 == 0) {
+					return x2;
+				};
+
+				return TString(x1, x2 - x1 + 1);
+			};
+
+			inline TString trimAscii() {
+				const T *x1;
+				const T *x2;
+				const T x[5] = {0x20, 0x09, 0x0D, 0x0A, 0x00};
+				x1 = TStringCore<T>::toNotInElement(*this, x);
+				x2 = TStringCore<T>::toNotInFromEndElement(*this, x);
+
+				if (*x1 == 0) {
+					return x1;
+				};
+
+				if (*x2 == 0) {
+					return x2;
+				};
+
+				return TString(x1, x2 - x1 + 1);
+			};
+
+			inline TString replace(const TString &x, const TString &y) {
+				TStringReference<T> *retV;
+				size_t k, ln;
+				size_t xLn;
+
+				xLn = x.length();
+				if (length() < xLn) {
+					return *this;
+				};
+
+				retV = TMemory<TStringReference<T>>::newMemory();
+				retV->init();
+
+				ln = length() - xLn;
+
+				k = 0;
+				while (k < ln) {
+					if (TStringCore<T>::compareN(index(k), x, xLn) == 0) {
+						retV->concatenateX(y.reference());
+						k += xLn;
+						continue;
+					} else {
+						retV->concatenateX(elementAt(k));
+						k++;
+					};
+				};
+
+				if (TStringCore<T>::compareN(index(k), x, xLn) == 0) {
+					retV->concatenateX(y.reference());
+				} else {
+					retV->concatenateX(index(k));
+				};
+
+				return retV;
+			};
+
+			inline TString nilAtFirst(const TString &x) {
+				size_t idx;
+				if (TStringCore<T>::indexOf(*this, x, idx)) {
+					return TString(*this, idx);
+				};
+				return *this;
+			};
+
+			inline TString nilAtFirstFromEnd(const TString &x) {
+				size_t idx;
+				if (TStringCore<T>::indexOfFromEnd(*this, x, idx)) {
+					return TString(*this, idx);
+				};
+				return *this;
+			};
+
+			inline TString substring(size_t start, size_t length) {
+				if (length == 0) {
+					return TString();
+				};
+				if (start > length()) {
+					return TString();
+				};
+				if (start + length > length()) {
+					length = length() - start;
+				};
+				return TString(index(start), length);
+			};
+
+			inline TString substring(size_t start) {
+				if (start > length()) {
+					return TString();
+				};
+				return TString(index(start), length() - start);
+			};
+
+			inline TString toLowerCaseAscii() {
+				TStringReference<T> *retV = TMemory<TStringReference<T>>::newMemory();
+
+				retV->init(length());
+
+				size_t totalLn;
+				const T *inx;
+				T *outx;
+
+				totalLn = 0;
+				inx = value();
+				outx = retV->value();
+				while (*inx) {
+					*outx = TStringCore<T>::elementToLowerCaseAscii(*inx);
+					++outx;
+					++inx;
+					++totalLn;
+				};
+				*outx = 0;
+				retV->setLength(totalLn);
+				return retV;
+			};
+
+			inline TString toUpperCaseAscii() {
+				TStringReference<T> *retV = TMemory<TStringReference<T>>::newMemory();
+
+				retV->init(length());
+
+				size_t totalLn;
+				const T *inx;
+				T *outx;
+
+				totalLn = 0;
+				inx = value();
+				outx = retV->value();
+				while (*inx) {
+					*outx = TStringCore<T>::elementToUpperCaseAscii(*inx);
+					++outx;
+					++inx;
+					++totalLn;
+				};
+				*outx = 0;
+
+				retV->setLength(totalLn);
+				return retV;
+			};
+
+			inline bool matchAscii(const TString &sig) {
+				return TStringCore<T>::matchAscii(*this, length(), sig, sig.length());
+			};
+
+			inline bool split2(const TString &sig, TString &firstPart, TString &secondPart) {
+				size_t index;
+				if (TStringCore<T>::indexOf(*this, length(), sig, sig.length(), 0, index)) {
+					firstPart = substring(0, index);
+					secondPart = substring(index + sig.length());
+					return true;
+				};
+				firstPart = *this;
+				secondPart = TStringCore<T>::empty;
+				return false;
+			};
+
+			inline bool split2FromEnd(const TString &sig, TString &firstPart, TString &secondPart) {
+				size_t index;
+				if (TStringCore<T>::indexOfFromEnd(*this, length(), sig, sig.length(), 0, index)) {
+					firstPart = substring(0, index);
+					secondPart = substring(index + sig.length());
+					return true;
+				};
+				firstPart = *this;
+				secondPart = TStringCore<T>::empty;
+				return false;
+			};
+
+			static inline void encodeC_(TStringReference<T> *retV) {
+				size_t k;
+				const T *scan;
+				scan = value();
+				for (k = 0; k < length(); ++k, ++scan) {
+					if (*scan == '\\') {
+						retV->concatenateX('\\');
+						retV->concatenateX('\\');
+						continue;
+					};
+					if (*scan == '"') {
+						retV->concatenateX('\\');
+						retV->concatenateX('"');
+						continue;
+					};
+					if (*scan == '\'') {
+						retV->concatenateX('\'');
+						continue;
+					};
+					if (*scan == '\n') {
+						retV->concatenateX('\\');
+						retV->concatenateX('n');
+						continue;
+					};
+					if (*scan == '\r') {
+						retV->concatenateX('\\');
+						retV->concatenateX('r');
+						continue;
+					};
+					if (*scan == '\t') {
+						retV->concatenateX('\\');
+						retV->concatenateX('t');
+						continue;
+					};
+					if (*scan >= 0x20 && *scan <= 0x7E) {
+						retV->concatenateX(*scan);
+						continue;
+					};
+					retV->concatenateX('\\');
+					retV->concatenateX('x');
+					retV->concatenateX(THex<T>::encodeUppercase((*scan >> 4) & 0x0F));
+					retV->concatenateX(THex<T>::encodeUppercase((*scan) & 0x0F));
+				};
+			};
+
+			inline TString encodeC() {
+				TStringReference<T> *retV = TMemory<TStringReference<T>>::newMemory();
+				retV->init();
+				retV->concatenateX('"');
+				encodeC_(retV);
+				retV->concatenateX('"');
+				return retV;
+			};
+
+			inline TString encodeCX() {
+				TStringReference<T> *retV = TMemory<TStringReference<T>>::newMemory();
+				retV->init();
+				encodeC_(retV);
+				return retV;
+			};
+
+			inline bool indexOf(const TString &b, size_t start, size_t &index) {
+				return TStringCore<T>::indexOf(*this, length(), b, b.length(), start, index);
+			};
+
+			inline bool indexOfFromEnd(const TString &b, size_t start, size_t &index) {
+				return TStringCore<T>::indexOfFromEnd(*this, length(), b, b.length(), start, index);
+			};
+
+			inline bool itContains(const TString &b) {
+				size_t index = 0;
+				return TStringCore<T>::indexOf(*this, length(), b, b.length(), 0, index);
+			};
+
+			inline bool beginWith(const TString &b) {
+				return (TStringCore<T>::compareN(*this, b, b.length()) == 0);
+			};
+
+			inline bool endsWith(const TString &b) {
+				if (b.length() > length()) {
+					return false;
+				};
+				return (TStringCore<T>::compareN(index(length() - b.length()), b, b.length()) == 0);
+			};
+
+			inline bool explode(const TString &delimiter, TDynamicArray<TString> &out) {
+				size_t index = 0;
+				size_t indexNext = 0;
+				if (delimiter.isEmpty()) {
+					return false;
+				};
+				for (;;) {
+					if (indexOf(delimiter, index, indexNext)) {
+						out.push(substring(index, indexNext - index));
+						index = indexNext + delimiter.length();
+						continue;
+					};
+					break;
+				};
+				if (index < length()) {
+					out.push(substring(index, length() - index));
+				};
+				return true;
+			};
+
+			static inline TString implode(const TString &delimiter, TDynamicArray<TString> &in) {
+				TString retV;
+				size_t k;
+				if (in.length() < 1) {
+					return retV;
+				};
+				retV = in[0];
+				for (k = 1; k < in.length(); ++k) {
+					retV += delimiter;
+					retV += in[k];
+				};
+				return retV;
+			};
+
 	};
 };
 
