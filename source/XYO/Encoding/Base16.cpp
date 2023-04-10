@@ -4,6 +4,7 @@
 // SPDX-FileCopyrightText: 2016-2023 Grigore Stefan <g_stefan@yahoo.com>
 // SPDX-License-Identifier: MIT
 
+#include <XYO/Encoding/THex.hpp>
 #include <XYO/Encoding/String.hpp>
 #include <XYO/Encoding/Base16.hpp>
 
