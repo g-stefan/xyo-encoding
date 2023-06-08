@@ -19,3 +19,4 @@
 #include <XYO/Encoding/Base16.cpp>
 #include <XYO/Encoding/Base32.cpp>
 #include <XYO/Encoding/Base64.cpp>
+#include <XYO/Encoding/NumberX.cpp>

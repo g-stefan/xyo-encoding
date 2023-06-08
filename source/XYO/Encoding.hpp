@@ -40,5 +40,6 @@
 #include <XYO/Encoding/Base16.hpp>
 #include <XYO/Encoding/Base32.hpp>
 #include <XYO/Encoding/Base64.hpp>
+#include <XYO/Encoding/NumberX.hpp>
 
 #endif
