@@ -8,7 +8,7 @@
 
 namespace XYO::Encoding::NumberX {
 
-	int countDigits(int value){
+	int countDigits(int value) {
 		int digits = 0;
 		do {
 			value /= 10;

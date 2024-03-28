@@ -19,7 +19,7 @@ namespace XYO::Encoding {
 
 	template <typename T>
 	class TStringReference : public Object {
-			XYO_DISALLOW_COPY_ASSIGN_MOVE(TStringReference);
+			XYO_PLATFORM_DISALLOW_COPY_ASSIGN_MOVE(TStringReference);
 
 		protected:
 			T *value_;

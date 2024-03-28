@@ -25,7 +25,7 @@ namespace XYO::Encoding {
 	};
 
 	class UTF8Read : public virtual IRead {
-			XYO_DISALLOW_COPY_ASSIGN_MOVE(UTF8Read);
+			XYO_PLATFORM_DISALLOW_COPY_ASSIGN_MOVE(UTF8Read);
 
 		protected:
 			char utf8Input[8];
@@ -50,7 +50,7 @@ namespace XYO::Encoding {
 	};
 
 	class UTF8Write : public virtual IWrite {
-			XYO_DISALLOW_COPY_ASSIGN_MOVE(UTF8Write);
+			XYO_PLATFORM_DISALLOW_COPY_ASSIGN_MOVE(UTF8Write);
 
 		protected:
 			char utf8Output[8];

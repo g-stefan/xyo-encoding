@@ -8,4 +8,4 @@
 #include <XYO/Encoding/Copyright.rh>
 #include <XYO/Encoding/Version.rh>
 
-XYO_APPLICATION_VERSION_INFO(XYO_ENCODING,"xyo-encoding.dll","XYO Encoding")
+XYO_PLATFORM_VERSION_INFO(XYO_ENCODING,"xyo-encoding.dll","XYO Encoding")
