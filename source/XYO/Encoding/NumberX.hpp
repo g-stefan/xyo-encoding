@@ -13,8 +13,8 @@
 
 namespace XYO::Encoding::NumberX {
 
-	int countDigits(int value);
-	String leftPadByDigits(int index, int indexLn);
+	XYO_ENCODING_EXPORT int countDigits(int value);
+	XYO_ENCODING_EXPORT String leftPadByDigits(int index, int indexLn);
 
 };
 
