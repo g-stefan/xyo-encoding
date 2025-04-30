@@ -1,7 +1,7 @@
 // Encoding
-// Copyright (c) 2016-2024 Grigore Stefan <g_stefan@yahoo.com>
+// Copyright (c) 2016-2025 Grigore Stefan <g_stefan@yahoo.com>
 // MIT License (MIT) <http://opensource.org/licenses/MIT>
-// SPDX-FileCopyrightText: 2016-2024 Grigore Stefan <g_stefan@yahoo.com>
+// SPDX-FileCopyrightText: 2016-2025 Grigore Stefan <g_stefan@yahoo.com>
 // SPDX-License-Identifier: MIT
 
 #ifndef XYO_ENCODING_TSTRINGCORE_HPP
@@ -204,28 +204,28 @@ namespace XYO::Encoding {
 				return indexOfFromEnd(x, length(x), y, length(y), pos, index);
 			};
 
-			static inline T elementToLowerCaseAscii(const T &x) {
+			static inline T elementToLowerCaseASCII(const T &x) {
 				if (x < 0x41 || x > 0x5A) {
 					return x;
 				};
 				return x + 0x20;
 			};
 
-			static inline T elementToUpperCaseAscii(const T &x) {
+			static inline T elementToUpperCaseASCII(const T &x) {
 				if (x < 0x61 || x > 0x7A) {
 					return x;
 				};
 				return x - 0x20;
 			};
 
-			static int compareIgnoreCaseAscii(const T *x, const T *y) {
+			static int compareIgnoreCaseASCII(const T *x, const T *y) {
 				T eX;
 				T eY;
 
 				while (*x != 0) {
 
-					eX = elementToLowerCaseAscii(*x);
-					eY = elementToLowerCaseAscii(*y);
+					eX = elementToLowerCaseASCII(*x);
+					eY = elementToLowerCaseASCII(*y);
 
 					if (eX != eY) {
 						if ((eX - eY) < 0) {
@@ -245,15 +245,15 @@ namespace XYO::Encoding {
 				return -1;
 			};
 
-			static int compareIgnoreCaseNAscii(const T *x, const T *y, size_t ln) {
+			static int compareIgnoreCaseN_ASCII(const T *x, const T *y, size_t ln) {
 
 				T eX;
 				T eY;
 
 				while ((ln != 0) && (*x != 0)) {
 
-					eX = elementToLowerCaseAscii(*x);
-					eY = elementToLowerCaseAscii(*y);
+					eX = elementToLowerCaseASCII(*x);
+					eY = elementToLowerCaseASCII(*y);
 
 					if (eX != eY) {
 						if ((eX - eY) < 0) {
@@ -278,7 +278,7 @@ namespace XYO::Encoding {
 				return -1;
 			};
 
-			static bool indexOfIgnoreCaseAscii(const T *x, size_t xLn, const T *y, size_t yLn, size_t pos, size_t &index) {
+			static bool indexOfIgnoreCaseASCII(const T *x, size_t xLn, const T *y, size_t yLn, size_t pos, size_t &index) {
 				if (pos > xLn) {
 					return false;
 				};
@@ -289,14 +289,14 @@ namespace XYO::Encoding {
 					return false;
 				};
 				for (index = pos; index <= xLn - yLn; ++index) {
-					if (compareIgnoreCaseNAscii(&x[index], y, yLn) == 0) {
+					if (compareIgnoreCaseN_ASCII(&x[index], y, yLn) == 0) {
 						return true;
 					};
 				};
 				return false;
 			};
 
-			static bool indexOfFromEndIgnoreCaseAscii(const T *x, size_t xLn, const T *y, size_t yLn, size_t pos, size_t &index) {
+			static bool indexOfFromEndIgnoreCaseASCII(const T *x, size_t xLn, const T *y, size_t yLn, size_t pos, size_t &index) {
 				if (pos > xLn) {
 					return false;
 				}
@@ -307,7 +307,7 @@ namespace XYO::Encoding {
 					return false;
 				}
 				for (index = xLn - pos - yLn + 1; index > 0; --index) {
-					if (compareIgnoreCaseNAscii(&x[index - 1], y, yLn)) {
+					if (compareIgnoreCaseN_ASCII(&x[index - 1], y, yLn)) {
 						--index;
 						return true;
 					};
@@ -359,7 +359,7 @@ namespace XYO::Encoding {
 				return xIndex2;
 			};
 
-			static bool matchAscii(const T *x, size_t xLn, const T *y, size_t yLn) {
+			static bool matchASCII(const T *x, size_t xLn, const T *y, size_t yLn) {
 				size_t i;
 				size_t j;
 				size_t k;
@@ -369,7 +369,7 @@ namespace XYO::Encoding {
 				j = 0;
 				for (; (i < yLn) && (j < xLn); ++i) {
 					if (y[i] == '*') {
-						while (x[j] && (elementToUpperCaseAscii(x[j]) != elementToUpperCaseAscii(y[i + 1]))) {
+						while (x[j] && (elementToUpperCaseASCII(x[j]) != elementToUpperCaseASCII(y[i + 1]))) {
 							j++;
 						};
 						if (x[j] == 0) {
@@ -381,7 +381,7 @@ namespace XYO::Encoding {
 						k = i + 1;
 						m = j;
 
-						while (x[m] && y[k] && (elementToUpperCaseAscii(x[m]) == elementToUpperCaseAscii(y[k]))) {
+						while (x[m] && y[k] && (elementToUpperCaseASCII(x[m]) == elementToUpperCaseASCII(y[k]))) {
 							++k;
 							++m;
 						};
@@ -404,7 +404,7 @@ namespace XYO::Encoding {
 						i--;
 
 						continue;
-					} else if ((elementToUpperCaseAscii(x[j]) == elementToUpperCaseAscii(y[i])) || (y[i] == '?')) {
+					} else if ((elementToUpperCaseASCII(x[j]) == elementToUpperCaseASCII(y[i])) || (y[i] == '?')) {
 						j++;
 					} else {
 						return false;
@@ -418,8 +418,8 @@ namespace XYO::Encoding {
 				return false;
 			};
 
-			static inline bool matchAscii(const T *x, const T *y) {
-				return matchAscii(x, length(x), y, length(y));
+			static inline bool matchASCII(const T *x, const T *y) {
+				return matchASCII(x, length(x), y, length(y));
 			};
 	};
 

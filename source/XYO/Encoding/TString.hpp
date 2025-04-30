@@ -1,7 +1,7 @@
 // Encoding
-// Copyright (c) 2016-2024 Grigore Stefan <g_stefan@yahoo.com>
+// Copyright (c) 2016-2025 Grigore Stefan <g_stefan@yahoo.com>
 // MIT License (MIT) <http://opensource.org/licenses/MIT>
-// SPDX-FileCopyrightText: 2016-2024 Grigore Stefan <g_stefan@yahoo.com>
+// SPDX-FileCopyrightText: 2016-2025 Grigore Stefan <g_stefan@yahoo.com>
 // SPDX-License-Identifier: MIT
 
 #ifndef XYO_ENCODING_TSTRING_HPP
@@ -344,7 +344,7 @@ namespace XYO::Encoding {
 				return TString(x1, x2 - x1 + 1);
 			};
 
-			inline TString trimAscii() const {
+			inline TString trimASCII() const {
 				const T *x1;
 				const T *x2;
 				const T x[5] = {0x20, 0x09, 0x0D, 0x0A, 0x00};
@@ -434,7 +434,7 @@ namespace XYO::Encoding {
 				return TString(index(start), length() - start);
 			};
 
-			inline TString toLowerCaseAscii() const {
+			inline TString toLowerCaseASCII() const {
 				TStringReference<T> *retV = TMemory<TStringReference<T>>::newMemory();
 
 				retV->init(length());
@@ -447,7 +447,7 @@ namespace XYO::Encoding {
 				inx = value();
 				outx = retV->value();
 				while (*inx) {
-					*outx = TStringCore<T>::elementToLowerCaseAscii(*inx);
+					*outx = TStringCore<T>::elementToLowerCaseASCII(*inx);
 					++outx;
 					++inx;
 					++totalLn;
@@ -457,7 +457,7 @@ namespace XYO::Encoding {
 				return retV;
 			};
 
-			inline TString toUpperCaseAscii() const {
+			inline TString toUpperCaseASCII() const {
 				TStringReference<T> *retV = TMemory<TStringReference<T>>::newMemory();
 
 				retV->init(length());
@@ -470,7 +470,7 @@ namespace XYO::Encoding {
 				inx = value();
 				outx = retV->value();
 				while (*inx) {
-					*outx = TStringCore<T>::elementToUpperCaseAscii(*inx);
+					*outx = TStringCore<T>::elementToUpperCaseASCII(*inx);
 					++outx;
 					++inx;
 					++totalLn;
@@ -481,8 +481,8 @@ namespace XYO::Encoding {
 				return retV;
 			};
 
-			inline bool matchAscii(const TString &sig) const {
-				return TStringCore<T>::matchAscii(*this, length(), sig, sig.length());
+			inline bool matchASCII(const TString &sig) const {
+				return TStringCore<T>::matchASCII(*this, length(), sig, sig.length());
 			};
 
 			inline bool split2(const TString &sig, TString &firstPart, TString &secondPart) const {
