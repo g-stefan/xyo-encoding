@@ -245,7 +245,7 @@ namespace XYO::Encoding {
 				return -1;
 			};
 
-			static int compareIgnoreCaseN_ASCII(const T *x, const T *y, size_t ln) {
+			static int compareIgnoreCaseNASCII(const T *x, const T *y, size_t ln) {
 
 				T eX;
 				T eY;
@@ -289,7 +289,7 @@ namespace XYO::Encoding {
 					return false;
 				};
 				for (index = pos; index <= xLn - yLn; ++index) {
-					if (compareIgnoreCaseN_ASCII(&x[index], y, yLn) == 0) {
+					if (compareIgnoreCaseNASCII(&x[index], y, yLn) == 0) {
 						return true;
 					};
 				};
@@ -307,7 +307,7 @@ namespace XYO::Encoding {
 					return false;
 				}
 				for (index = xLn - pos - yLn + 1; index > 0; --index) {
-					if (compareIgnoreCaseN_ASCII(&x[index - 1], y, yLn)) {
+					if (compareIgnoreCaseNASCII(&x[index - 1], y, yLn)) {
 						--index;
 						return true;
 					};
