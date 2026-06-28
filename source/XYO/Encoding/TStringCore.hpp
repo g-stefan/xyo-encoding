@@ -307,7 +307,7 @@ namespace XYO::Encoding {
 					return false;
 				}
 				for (index = xLn - pos - yLn + 1; index > 0; --index) {
-					if (compareIgnoreCaseNASCII(&x[index - 1], y, yLn)) {
+					if (compareIgnoreCaseNASCII(&x[index - 1], y, yLn) == 0) {
 						--index;
 						return true;
 					};
