@@ -14,79 +14,36 @@ namespace XYO::Encoding::UTF {
 	const utf32 utf32StringQuestionMark[] = {'?', 0};
 
 	size_t elementUTF32FromUTF8(utf32 *out, const utf8 *in) {
-		size_t in_sz;
-		in_sz = UTF8Core::elementSize(*in);
-		if (in_sz == 0) {
-			return 0;
-		};
 		if (!UTF8Core::elementIsValid(in)) {
 			return 0;
 		};
-		*out = 0;
-		switch (in_sz) {
+		switch (UTF8Core::elementSize(*in)) {
 		case 1:
-			*out = (utf32)*in;
+			*out = (utf32)((uint8_t)in[0]);
 			break;
 		case 2:
-			*out = (utf32)(*in & 0x1F);
+			*out = (utf32)(in[0] & 0x1F);
 			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
+			*out |= (utf32)(in[1] & 0x3F);
 			break;
 		case 3:
-			*out = (utf32)(*in & 0x0F);
+			*out = (utf32)(in[0] & 0x0F);
 			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
+			*out |= (utf32)(in[1] & 0x3F);
 			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
+			*out |= (utf32)(in[2] & 0x3F);
 			break;
 		case 4:
-			*out = (utf32)(*in & 0x07);
+			*out = (utf32)(in[0] & 0x07);
 			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
+			*out |= (utf32)(in[1] & 0x3F);
 			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
+			*out |= (utf32)(in[2] & 0x3F);
 			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
+			*out |= (utf32)(in[3] & 0x3F);
 			break;
-		case 5:
-			*out = (utf32)(*in & 0x03);
-			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
-			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
-			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
-			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
-			break;
-		case 6:
-			*out = (utf32)(*in & 0x01);
-			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
-			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
-			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
-			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
-			*out <<= 6;
-			++in;
-			*out |= (utf32)(*in & 0x3F);
-			break;
+		default:
+			return 0;
 		};
 		if (UTF32Core::elementIsValid(*out)) {
 			return 1;
@@ -98,105 +55,49 @@ namespace XYO::Encoding::UTF {
 		if (!UTF32Core::elementIsValid(in)) {
 			return 0;
 		};
-
-		// ISO-10646-UTF-8
-		if ((in & 0xFFFFFF80) == 0x00000000) {
+		// RFC 3629, valid code points are at most U+10FFFF, 4 bytes
+		if (in < 0x00000080) {
 			return 1;
 		};
-		if ((in & 0xFFFFF800) == 0x00000000) {
+		if (in < 0x00000800) {
 			return 2;
 		};
-		if ((in & 0xFFFF0000) == 0x00000000) {
+		if (in < 0x00010000) {
 			return 3;
 		};
-		if ((in & 0xFFE00000) == 0x00000000) { // <-- never here ...
-			return 4;
-		};
-		if ((in & 0xFC000000) == 0x00000000) {
-			return 5;
-		};
-		if ((in & 0x80000000) == 0x00000000) {
-			return 6;
-		};
-		return 0;
+		return 4;
 	};
 
 	size_t elementUTF8FromUTF32(utf8 *out, utf32 in) {
 		size_t sz;
 		sz = elementUTF8FromUTF32Size(in);
-		if (sz == 0) {
-			return 0;
-		};
-		*out = 0;
 		switch (sz) {
 		case 1:
-			*out = (utf8)in;
+			out[0] = (utf8)in;
 			break;
 		case 2:
-			out += 1;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
+			out[1] = (utf8)((in & 0x3F) | 0x80);
 			in >>= 6;
-			*out = (utf8)((in & 0x1F) | 0xC0);
+			out[0] = (utf8)((in & 0x1F) | 0xC0);
 			break;
 		case 3:
-			out += 2;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
+			out[2] = (utf8)((in & 0x3F) | 0x80);
 			in >>= 6;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
+			out[1] = (utf8)((in & 0x3F) | 0x80);
 			in >>= 6;
-			*out = (utf8)((in & 0x0F) | 0xE0);
+			out[0] = (utf8)((in & 0x0F) | 0xE0);
 			break;
 		case 4:
-			out += 3;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
+			out[3] = (utf8)((in & 0x3F) | 0x80);
 			in >>= 6;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
+			out[2] = (utf8)((in & 0x3F) | 0x80);
 			in >>= 6;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
+			out[1] = (utf8)((in & 0x3F) | 0x80);
 			in >>= 6;
-			*out = (utf8)((in & 0x07) | 0xF0);
+			out[0] = (utf8)((in & 0x07) | 0xF0);
 			break;
-		case 5:
-			out += 4;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
-			in >>= 6;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
-			in >>= 6;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
-			in >>= 6;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
-			in >>= 6;
-			*out = (utf8)((in & 0x03) | 0xF8);
-			break;
-		case 6:
-			out += 5;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
-			in >>= 6;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
-			in >>= 6;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
-			in >>= 6;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
-			in >>= 6;
-			*out = (utf8)((in & 0x3F) | 0x80);
-			--out;
-			in >>= 6;
-			*out = (utf8)((in & 0x01) | 0xFC);
-			break;
+		default:
+			return 0;
 		};
 		return sz;
 	};
@@ -241,7 +142,7 @@ namespace XYO::Encoding::UTF {
 			return 0;
 		};
 		if (!UTF16Core::elementIsValid(in)) {
-			return false;
+			return 0;
 		};
 		*out = 0;
 		switch (sz) {
@@ -263,101 +164,90 @@ namespace XYO::Encoding::UTF {
 	};
 
 	size_t elementUTF8FromUTF16Size(const utf16 *in) {
-		if ((*in & 0xFC00) == 0xD800) {
-			++in;
-			if ((*in & 0xFF80) == 0x0000) {
-				return 3;
-			};
-			if ((*in & 0xF800) == 0x0000) {
-				return 4;
-			};
-			return 5;
-		};
-
-		if ((*in & 0xFC00) == 0xDC00) {
-			return 0;
-		}
-		if (*in >= 0xFFFE) {
+		utf32 tmp;
+		if (!elementUTF32FromUTF16(&tmp, in)) {
 			return 0;
 		};
+		return elementUTF8FromUTF32Size(tmp);
+	};
 
-		if ((*in & 0xFF80) == 0x0000) {
-			return 1;
+	// Decode one element, returns the number of input elements used or 0 if invalid.
+	// On an invalid element the converters below skip a single input element, so they
+	// never step over the terminator of a truncated sequence nor swallow valid data.
+
+	static inline size_t decodeUTF8_(utf32 *out, const utf8 *in) {
+		if (elementUTF32FromUTF8(out, in)) {
+			return UTF8Core::elementSize(*in);
 		};
-		if ((*in & 0xF800) == 0x0000) {
-			return 2;
+		return 0;
+	};
+
+	static inline size_t decodeUTF16_(utf32 *out, const utf16 *in) {
+		if (elementUTF32FromUTF16(out, in)) {
+			return UTF16Core::elementSize(*in);
 		};
-		return 3;
+		return 0;
 	};
 
 	String utf8FromUTF16(const utf16 *in, const utf8 *err) {
-		String retV;
+		TPointer<StringReference> retV(TMemory<StringReference>::newMemory());
+		retV->init(utf8FromUTF16Length(in, err));
+
+		size_t errLn = StringUTF8Core::length(err);
 		utf8 chr[8];
 		utf32 tmp;
 		size_t sz;
 
 		while (*in) {
-
-			sz = UTF16Core::elementSize(*in);
+			sz = decodeUTF16_(&tmp, in);
 			if (sz) {
-				if (elementUTF32FromUTF16(&tmp, in)) {
-					chr[elementUTF8FromUTF32(chr, tmp)] = 0;
-					retV += chr;
-				} else {
-					retV += err;
-				};
+				retV->concatenateX(chr, elementUTF8FromUTF32(chr, tmp));
 				in += sz;
 				continue;
 			};
-
-			retV += err;
+			retV->concatenateX(err, errLn);
 			++in;
 		};
 		return retV;
 	};
 
 	String utf8FromUTF32(const utf32 *in, const utf8 *err) {
-		String retV;
+		TPointer<StringReference> retV(TMemory<StringReference>::newMemory());
+		retV->init(utf8FromUTF32Length(in, err));
+
+		size_t errLn = StringUTF8Core::length(err);
 		utf8 chr[8];
 		size_t sz;
 
 		while (*in) {
-
-			sz = UTF32Core::elementSize(*in);
+			sz = elementUTF8FromUTF32(chr, *in);
 			if (sz) {
-				chr[elementUTF8FromUTF32(chr, *in)] = 0;
-				retV += chr;
-				in += sz;
-				continue;
+				retV->concatenateX(chr, sz);
+			} else {
+				retV->concatenateX(err, errLn);
 			};
-
-			retV += err;
 			++in;
 		};
 		return retV;
 	};
 
 	StringUTF16 utf16FromUTF8(const utf8 *in, const utf16 *err) {
-		StringUTF16 retV;
+		TPointer<StringUTF16Reference> retV(TMemory<StringUTF16Reference>::newMemory());
+		retV->init(utf16FromUTF8Length(in, err));
+
+		size_t errLn = StringUTF16Core::length(err);
 		utf32 tmp;
 		utf16 chr[4];
 		size_t sz;
 
 		while (*in) {
-
-			sz = UTF8Core::elementSize(*in);
+			sz = decodeUTF8_(&tmp, in);
 			if (sz) {
-				if (elementUTF32FromUTF8(&tmp, in)) {
-					chr[elementUTF16FromUTF32(chr, tmp)] = 0;
-					retV += chr;
-				} else {
-					retV += err;
-				};
+				retV->concatenateX(chr, elementUTF16FromUTF32(chr, tmp));
 				in += sz;
 				continue;
 			};
-
-			retV += err;
+			retV->concatenateX(err, errLn);
 			++in;
 		};
 
@@ -365,20 +255,20 @@ namespace XYO::Encoding::UTF {
 	};
 
 	StringUTF16 utf16FromUTF32(const utf32 *in, const utf16 *err) {
-		StringUTF16 retV;
+		TPointer<StringUTF16Reference> retV(TMemory<StringUTF16Reference>::newMemory());
+		retV->init(utf16FromUTF32Length(in, err));
+
+		size_t errLn = StringUTF16Core::length(err);
 		utf16 chr[4];
 		size_t sz;
 
 		while (*in) {
-
-			sz = UTF32Core::elementSize(*in);
+			sz = elementUTF16FromUTF32(chr, *in);
 			if (sz) {
-				chr[elementUTF16FromUTF32(chr, *in)] = 0;
-				retV += chr;
-				continue;
+				retV->concatenateX(chr, sz);
+			} else {
+				retV->concatenateX(err, errLn);
 			};
-
-			retV += err;
 			++in;
 		};
 
@@ -386,21 +276,21 @@ namespace XYO::Encoding::UTF {
 	};
 
 	StringUTF32 utf32FromUTF8(const utf8 *in, const utf32 *err) {
-		StringUTF32 retV;
-		utf32 chr[2];
+		TPointer<StringUTF32Reference> retV(TMemory<StringUTF32Reference>::newMemory());
+		retV->init(utf32FromUTF8Length(in, err));
+
+		size_t errLn = StringUTF32Core::length(err);
+		utf32 tmp;
 		size_t sz;
 
 		while (*in) {
-
-			sz = UTF8Core::elementSize(*in);
+			sz = decodeUTF8_(&tmp, in);
 			if (sz) {
-				chr[elementUTF32FromUTF8(chr, in)] = 0;
-				retV += chr;
+				retV->concatenateX(tmp);
 				in += sz;
 				continue;
 			};
-
-			retV += err;
+			retV->concatenateX(err, errLn);
 			++in;
 		};
 
@@ -408,44 +298,77 @@ namespace XYO::Encoding::UTF {
 	};
 
 	StringUTF32 utf32FromUTF16(const utf16 *in, const utf32 *err) {
-		StringUTF32 retV;
-		utf32 chr[2];
+		TPointer<StringUTF32Reference> retV(TMemory<StringUTF32Reference>::newMemory());
+		retV->init(utf32FromUTF16Length(in, err));
+
+		size_t errLn = StringUTF32Core::length(err);
+		utf32 tmp;
 		size_t sz;
 
 		while (*in) {
-			sz = UTF16Core::elementSize(*in);
+			sz = decodeUTF16_(&tmp, in);
 			if (sz) {
-				chr[elementUTF32FromUTF16(chr, in)] = 0;
-				retV += chr;
+				retV->concatenateX(tmp);
 				in += sz;
 				continue;
 			};
-
-			retV += err;
+			retV->concatenateX(err, errLn);
 			++in;
 		};
 
 		return retV;
 	};
 
-	size_t utf16FromUTF8Length(const utf8 *in, const utf16 *err) {
+	size_t utf8FromUTF16Length(const utf16 *in, const utf8 *err) {
 		size_t ln = 0;
+		size_t errLn = StringUTF8Core::length(err);
 		utf32 tmp;
 		size_t sz;
 
 		while (*in) {
-			sz = UTF8Core::elementSize(*in);
+			sz = decodeUTF16_(&tmp, in);
 			if (sz) {
-				if (elementUTF32FromUTF8(&tmp, in)) {
-					ln += elementUTF16FromUTF32Size(tmp);
-				} else {
-					ln += StringUTF16Core::length(err);
-				};
+				ln += elementUTF8FromUTF32Size(tmp);
 				in += sz;
 				continue;
 			};
+			ln += errLn;
+			++in;
+		};
+		return ln;
+	};
 
-			ln += StringUTF16Core::length(err);
+	size_t utf8FromUTF32Length(const utf32 *in, const utf8 *err) {
+		size_t ln = 0;
+		size_t errLn = StringUTF8Core::length(err);
+		size_t sz;
+
+		while (*in) {
+			sz = elementUTF8FromUTF32Size(*in);
+			if (sz) {
+				ln += sz;
+			} else {
+				ln += errLn;
+			};
+			++in;
+		};
+		return ln;
+	};
+
+	size_t utf16FromUTF8Length(const utf8 *in, const utf16 *err) {
+		size_t ln = 0;
+		size_t errLn = StringUTF16Core::length(err);
+		utf32 tmp;
+		size_t sz;
+
+		while (*in) {
+			sz = decodeUTF8_(&tmp, in);
+			if (sz) {
+				ln += elementUTF16FromUTF32Size(tmp);
+				in += sz;
+				continue;
+			};
+			ln += errLn;
 			++in;
 		};
 		return ln;
@@ -453,17 +376,16 @@ namespace XYO::Encoding::UTF {
 
 	size_t utf16FromUTF32Length(const utf32 *in, const utf16 *err) {
 		size_t ln = 0;
+		size_t errLn = StringUTF16Core::length(err);
 		size_t sz;
 
 		while (*in) {
-			sz = UTF32Core::elementSize(*in);
+			sz = elementUTF16FromUTF32Size(*in);
 			if (sz) {
-				ln += elementUTF16FromUTF32Size(*in);
-				in += sz;
-				continue;
+				ln += sz;
+			} else {
+				ln += errLn;
 			};
-
-			ln += StringUTF16Core::length(err);
 			++in;
 		};
 		return ln;
@@ -471,19 +393,18 @@ namespace XYO::Encoding::UTF {
 
 	size_t utf32FromUTF8Length(const utf8 *in, const utf32 *err) {
 		size_t ln = 0;
-		size_t lnX;
+		size_t errLn = StringUTF32Core::length(err);
+		utf32 tmp;
 		size_t sz;
-		utf32 chr;
 
 		while (*in) {
-			sz = UTF8Core::elementSize(*in);
+			sz = decodeUTF8_(&tmp, in);
 			if (sz) {
-				ln += elementUTF32FromUTF8(&chr, in);
+				++ln;
 				in += sz;
 				continue;
 			};
-
-			ln += StringUTF32Core::length(err);
+			ln += errLn;
 			++in;
 		};
 		return ln;
@@ -491,19 +412,18 @@ namespace XYO::Encoding::UTF {
 
 	size_t utf32FromUTF16Length(const utf16 *in, const utf32 *err) {
 		size_t ln = 0;
-		size_t lnX;
+		size_t errLn = StringUTF32Core::length(err);
+		utf32 tmp;
 		size_t sz;
-		utf32 chr;
 
 		while (*in) {
-			sz = UTF16Core::elementSize(*in);
+			sz = decodeUTF16_(&tmp, in);
 			if (sz) {
-				ln += elementUTF32FromUTF16(&chr, in);
+				++ln;
 				in += sz;
 				continue;
 			};
-
-			ln += StringUTF32Core::length(err);
+			ln += errLn;
 			++in;
 		};
 		return ln;

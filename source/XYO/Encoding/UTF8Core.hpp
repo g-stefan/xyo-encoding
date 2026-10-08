@@ -17,24 +17,24 @@ namespace XYO::Encoding {
 
 	namespace UTF8Core {
 
+		// RFC 3629: lead bytes C0, C1 (always overlong) and F5..FF (above U+10FFFF,
+		// or the obsolete 5 and 6 byte forms) are not valid
 		inline size_t elementSize(const utf8 x) {
-			if ((x & 0x80) == 0x00) {
+			uint8_t x_ = static_cast<uint8_t>(x);
+			if (x_ < 0x80) {
 				return 1;
 			};
-			if ((x & 0xE0) == 0xC0) {
+			if (x_ < 0xC2) {
+				return 0;
+			};
+			if (x_ < 0xE0) {
 				return 2;
 			};
-			if ((x & 0xF0) == 0xE0) {
+			if (x_ < 0xF0) {
 				return 3;
 			};
-			if ((x & 0xF8) == 0xF0) {
+			if (x_ < 0xF5) {
 				return 4;
-			};
-			if ((x & 0xFC) == 0xF8) {
-				return 5;
-			};
-			if ((x & 0xFE) == 0xFC) {
-				return 6;
 			};
 			return 0;
 		};
@@ -45,14 +45,39 @@ namespace XYO::Encoding {
 			if (sz == 0) {
 				return false;
 			};
-			++x;
-			--sz;
-			while (sz) {
-				if ((*x & 0xC0) != 0x80) {
+			if (sz == 1) {
+				return true;
+			};
+			// the second byte range rejects overlong forms (E0, F0),
+			// surrogates (ED) and code points above U+10FFFF (F4)
+			uint8_t lead = static_cast<uint8_t>(x[0]);
+			uint8_t next = static_cast<uint8_t>(x[1]);
+			uint8_t low = 0x80;
+			uint8_t high = 0xBF;
+			switch (lead) {
+			case 0xE0:
+				low = 0xA0;
+				break;
+			case 0xED:
+				high = 0x9F;
+				break;
+			case 0xF0:
+				low = 0x90;
+				break;
+			case 0xF4:
+				high = 0x8F;
+				break;
+			default:
+				break;
+			};
+			if ((next < low) || (next > high)) {
+				return false;
+			};
+			// the terminator is not a continuation byte, the scan stops on it
+			for (size_t k = 2; k < sz; ++k) {
+				if ((static_cast<uint8_t>(x[k]) & 0xC0) != 0x80) {
 					return false;
 				};
-				++x;
-				--sz;
 			};
 			return true;
 		};

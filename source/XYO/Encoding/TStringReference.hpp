@@ -227,7 +227,19 @@ namespace XYO::Encoding {
 				if (newLength_ < size_) {
 					return newLength_;
 				};
-				memoryResize_(((newLength_ / chunk_) + 1) * chunk_);
+				size_t newSize_ = ((newLength_ / chunk_) + 1) * chunk_;
+				// While the allocation still fits one of the pooled small-string
+				// buckets (<= 256) keep the chunk-based growth so it lands on a
+				// pool size. Once the string outgrows the pool, grow geometrically
+				// (at least double) so repeated appends stay amortized O(1) instead
+				// of reallocating and copying the whole buffer every chunk_ bytes.
+				if (newSize_ > 256) {
+					size_t geometric_ = size_ * 2;
+					if (geometric_ > newSize_) {
+						newSize_ = geometric_;
+					};
+				};
+				memoryResize_(newSize_);
 				return newLength_;
 			};
 
@@ -243,9 +255,22 @@ namespace XYO::Encoding {
 				return newLength_;
 			};
 
+			// True if x points inside our own buffer (e.g. s += s.index(k)); such
+			// a source must be re-based after a resize frees the old buffer.
+			inline bool isOwnMemory_(const T *x) const {
+				if (value_ == nullptr) {
+					return false;
+				};
+				uintptr_t begin_ = reinterpret_cast<uintptr_t>(value_);
+				uintptr_t x_ = reinterpret_cast<uintptr_t>(x);
+				return (x_ >= begin_) && (x_ < begin_ + size_ * sizeof(T));
+			};
+
 		public:
 			inline TStringReference() {
 				value_ = nullptr;
+				length_ = 0;
+				size_ = 0;
 				mode_ = false;
 				chunk_ = 32;
 			};
@@ -265,7 +290,11 @@ namespace XYO::Encoding {
 				TMemory<TStringCoreReferenceMemory<T, 256>>::initMemory();
 			};
 
-			inline T *value() const {
+			inline T *value() {
+				return value_;
+			};
+
+			inline const T *value() const {
 				return value_;
 			};
 
@@ -278,6 +307,9 @@ namespace XYO::Encoding {
 			};
 
 			inline void setLength(size_t length) {
+				if (size_ == 0) {
+					return;
+				};
 				if (length >= size_) {
 					length = size_ - 1;
 				};
@@ -330,25 +362,25 @@ namespace XYO::Encoding {
 				TStringCore<T>::copyMemory(value_, o, oLn);
 			};
 
-			inline void concatenate(TStringReference *o, const T *x) {
+			inline void concatenate(const TStringReference *o, const T *x) {
 				length_ = memoryNewCheck_(o->length_ + TStringCore<T>::length(x));
 				TMemoryCore<T>::copyN(value_, o->value_, o->length_);
 				TStringCore<T>::copy(&value_[o->length_], x);
 			};
 
-			inline void concatenate(TStringReference *o, TStringReference *x) {
+			inline void concatenate(const TStringReference *o, const TStringReference *x) {
 				length_ = memoryNewCheck_(o->length_ + x->length_);
 				TMemoryCore<T>::copyN(value_, o->value_, o->length_);
 				TMemoryCore<T>::copyN(&value_[o->length_], x->value_, x->length_ + 1);
 			};
 
-			inline void concatenate(TStringReference *o, const T *x, size_t xLn) {
+			inline void concatenate(const TStringReference *o, const T *x, size_t xLn) {
 				length_ = memoryNewCheck_(o->length_ + xLn);
 				TMemoryCore<T>::copyN(value_, o->value_, o->length_);
 				TStringCore<T>::copyMemory(&value_[o->length_], x, xLn);
 			};
 
-			inline void concatenate(TStringReference *o, const T &x) {
+			inline void concatenate(const TStringReference *o, const T &x) {
 				length_ = memoryNewCheck_(o->length_ + 1);
 				TMemoryCore<T>::copyN(value_, o->value_, o->length_);
 				value_[o->length_] = x;
@@ -356,27 +388,35 @@ namespace XYO::Encoding {
 			};
 
 			inline void concatenateX(const T *x) {
-				size_t index = length_;
-				length_ = memoryResizeCheck_(length_ + TStringCore<T>::length(x));
-				TStringCore<T>::copy(&value_[index], x);
+				concatenateX(x, TStringCore<T>::length(x));
 			};
 
-			inline void concatenateX(TStringReference *x) {
+			inline void concatenateX(const TStringReference *x) {
+				// x may be this, read its length before it changes
+				size_t xLn = x->length_;
 				size_t index = length_;
-				length_ = memoryResizeCheck_(length_ + x->length_);
-				TMemoryCore<T>::copyN(&value_[index], x->value_, x->length_ + 1);
+				length_ = memoryResizeCheck_(length_ + xLn);
+				TStringCore<T>::copyMemory(&value_[index], x->value_, xLn);
 			};
 
 			inline void concatenateX(const T *x, size_t xLn) {
 				size_t index = length_;
-				length_ = memoryResizeCheck_(length_ + xLn);
+				if (isOwnMemory_(x)) {
+					size_t offset = x - value_;
+					length_ = memoryResizeCheck_(length_ + xLn);
+					x = value_ + offset;
+				} else {
+					length_ = memoryResizeCheck_(length_ + xLn);
+				};
 				TStringCore<T>::copyMemory(&value_[index], x, xLn);
 			};
 
 			inline void concatenateX(const T &x) {
+				// x may reference an element of our own buffer
+				T x_ = x;
 				size_t index = length_;
 				length_ = memoryResizeCheck_(length_ + 1);
-				value_[index] = x;
+				value_[index] = x_;
 				value_[index + 1] = 0;
 			};
 	};

@@ -27,13 +27,19 @@ namespace XYO::Encoding::Base16 {
 	};
 
 	bool decode(const String &toDecode, String &out) {
+		if (toDecode.length() % 2) {
+			return false;
+		};
 		TPointer<StringReference> retV(TMemory<StringReference>::newMemory());
 		retV->init((toDecode.length() / 2));
 		size_t k;
 		const char *scan;
 		scan = toDecode.value();
 		for (k = 0; k < toDecode.length() / 2; ++k, scan += 2) {
-			retV->concatenateX(THex<char>::decode(*scan) << 4 | THex<char>::decode(*(scan + 1)));
+			if (!(THex<char>::isValid(*scan) && THex<char>::isValid(*(scan + 1)))) {
+				return false;
+			};
+			retV->concatenateX((char)(THex<char>::decode(*scan) << 4 | THex<char>::decode(*(scan + 1))));
 		};
 		out = retV;
 		return true;

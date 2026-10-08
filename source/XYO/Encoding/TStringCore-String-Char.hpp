@@ -25,7 +25,13 @@ namespace XYO::Encoding {
 
 	template <>
 	inline void TStringCore<char>::copyN(char *x, const char *y, size_t yLn) {
-		strncpy(x, y, yLn);
+		// same as the generic version, always terminated (strncpy is not)
+		const char *end = static_cast<const char *>(memchr(y, 0, yLn));
+		if (end != nullptr) {
+			yLn = end - y;
+		};
+		memcpy(x, y, yLn);
+		x[yLn] = 0;
 	};
 
 	template <>

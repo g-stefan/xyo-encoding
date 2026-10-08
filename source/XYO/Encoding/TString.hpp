@@ -24,6 +24,18 @@ namespace XYO::Encoding {
 		protected:
 			TPointer<TStringReference<T>> value_;
 
+			// Copy on write, give this string its own buffer before an in place change,
+			// the other strings sharing the current buffer keep their value
+			inline void unshare_() {
+				if (value_->hasOneReference()) {
+					return;
+				};
+				TStringReference<T> *newString = TMemory<TStringReference<T>>::newMemory();
+				newString->setChunk(value_->chunk());
+				newString->from(value_->value(), value_->length());
+				value_ = newString;
+			};
+
 		public:
 			inline TString() {
 				value_.newMemory();
@@ -73,8 +85,10 @@ namespace XYO::Encoding {
 			};
 
 			inline TString &operator=(const T *value) {
-				value_.newMemory();
-				value_->from(value);
+				// value may point inside our current buffer, copy it before release
+				TStringReference<T> *newString = TMemory<TStringReference<T>>::newMemory();
+				newString->from(value);
+				value_ = newString;
 				return *this;
 			};
 
@@ -181,12 +195,23 @@ namespace XYO::Encoding {
 				return &(value_->value())[x];
 			};
 
-			inline T &elementAt(size_t x) const {
+			// Read only, by value, a reference would allow writing into a shared buffer
+			inline T elementAt(size_t x) const {
 				return (value_->value())[x];
 			};
 
-			inline T &operator[](int x) const {
+			inline T operator[](int x) const {
 				return (value_->value())[x];
+			};
+
+			// Copy on write, in place only if this string is the single user of its buffer
+			inline bool setElementAt(size_t x, T element) {
+				if (x >= length()) {
+					return false;
+				};
+				unshare_();
+				(value_->value())[x] = element;
+				return true;
 			};
 
 			inline size_t length() const {
@@ -204,6 +229,9 @@ namespace XYO::Encoding {
 			};
 
 			inline void set(const TString &value, size_t length) {
+				if (length > value.length()) {
+					length = value.length();
+				};
 				TStringReference<T> *newString = TMemory<TStringReference<T>>::newMemory();
 				newString->from(const_cast<TString &>(value), length);
 				value_ = newString;
@@ -220,6 +248,9 @@ namespace XYO::Encoding {
 			};
 
 			inline void concatenate(const TString &value, size_t length) {
+				if (length > value.length()) {
+					length = value.length();
+				};
 				if (value_->hasOneReference()) {
 					value_->concatenateX(const_cast<TString &>(value), length);
 				} else {
@@ -299,7 +330,8 @@ namespace XYO::Encoding {
 				TMemory<TStringReference<T>>::initMemory();
 			};
 
-			inline TStringReference<T> *reference() const {
+			// Read only, the buffer may be shared with other strings
+			inline const TStringReference<T> *reference() const {
 				return value_;
 			};
 
@@ -368,7 +400,7 @@ namespace XYO::Encoding {
 				size_t xLn;
 
 				xLn = x.length();
-				if (length() < xLn) {
+				if ((xLn == 0) || (length() < xLn)) {
 					return *this;
 				};
 
@@ -510,10 +542,22 @@ namespace XYO::Encoding {
 			};
 
 			inline void encodeC_(TStringReference<T> *retV) const {
+				typedef typename std::make_unsigned<T>::type U;
 				size_t k;
 				const T *scan;
+				bool afterHex = false;
 				scan = value();
 				for (k = 0; k < length(); ++k, ++scan) {
+					if (afterHex) {
+						afterHex = false;
+						// C hex escapes are greedy, "\x01" followed by "A" would read as \x01A,
+						// so a hex digit right after a hex escape is escaped too
+						if (THex<T>::isValid(*scan)) {
+							encodeCHex_(retV, static_cast<U>(*scan));
+							afterHex = true;
+							continue;
+						};
+					};
 					if (*scan == '\\') {
 						retV->concatenateX('\\');
 						retV->concatenateX('\\');
@@ -547,10 +591,24 @@ namespace XYO::Encoding {
 						retV->concatenateX(*scan);
 						continue;
 					};
-					retV->concatenateX('\\');
-					retV->concatenateX('x');
-					retV->concatenateX(THex<T>::encodeUppercase((*scan >> 4) & 0x0F));
-					retV->concatenateX(THex<T>::encodeUppercase((*scan) & 0x0F));
+					encodeCHex_(retV, static_cast<U>(*scan));
+					afterHex = true;
+				};
+			};
+
+			// \xHH, or \xHHHH / \xHHHHHHHH for wide elements that do not fit in a byte
+			static inline void encodeCHex_(TStringReference<T> *retV, typename std::make_unsigned<T>::type x) {
+				typedef typename std::make_unsigned<T>::type U;
+				int shift = 4;
+				if (static_cast<uint32_t>(x) > 0xFFFF) {
+					shift = 28;
+				} else if (static_cast<uint32_t>(x) > 0xFF) {
+					shift = 12;
+				};
+				retV->concatenateX('\\');
+				retV->concatenateX('x');
+				for (; shift >= 0; shift -= 4) {
+					retV->concatenateX(THex<T>::encodeUppercase(static_cast<U>((static_cast<uint32_t>(x) >> shift) & 0x0F)));
 				};
 			};
 
@@ -620,10 +678,10 @@ namespace XYO::Encoding {
 				if (in.length() < 1) {
 					return retV;
 				};
-				retV = in[0];
+				retV = in.index(0);
 				for (k = 1; k < in.length(); ++k) {
 					retV += delimiter;
-					retV += in[k];
+					retV += in.index(k);
 				};
 				return retV;
 			};

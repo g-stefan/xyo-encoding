@@ -16,6 +16,11 @@ namespace XYO::Encoding {
 	template <typename T>
 	struct TMemoryCore {
 
+			static inline bool elementIsLess_(const T x, const T y) {
+				typedef typename std::make_unsigned<T>::type U;
+				return static_cast<U>(x) < static_cast<U>(y);
+			};
+
 			static inline void copyN(T *x, const T *y, size_t ln) {
 
 				while (ln != 0) {
@@ -40,7 +45,7 @@ namespace XYO::Encoding {
 					return 0;
 				};
 
-				if ((*x - *y) < 0) {
+				if (elementIsLess_(*x, *y)) {
 					return -1;
 				};
 

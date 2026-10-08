@@ -18,6 +18,13 @@ namespace XYO::Encoding {
 
 			static const T empty[];
 
+			// Order elements as unsigned values, (x - y) < 0 is never true for
+			// uint32_t and does not match strcmp for signed char
+			static inline bool elementIsLess_(const T x, const T y) {
+				typedef typename std::make_unsigned<T>::type U;
+				return static_cast<U>(x) < static_cast<U>(y);
+			};
+
 			static inline size_t length(const T *x) {
 				size_t ln = 0;
 				while (*x != 0) {
@@ -70,7 +77,7 @@ namespace XYO::Encoding {
 				while (*x != 0) {
 
 					if (*x != *y) {
-						if ((*x - *y) < 0) {
+						if (elementIsLess_(*x, *y)) {
 							return -1;
 						};
 						return 1;
@@ -92,7 +99,7 @@ namespace XYO::Encoding {
 				while ((ln != 0) && (*x != 0)) {
 
 					if (*x != *y) {
-						if ((*x - *y) < 0) {
+						if (elementIsLess_(*x, *y)) {
 							return -1;
 						};
 						return 1;
@@ -228,7 +235,7 @@ namespace XYO::Encoding {
 					eY = elementToLowerCaseASCII(*y);
 
 					if (eX != eY) {
-						if ((eX - eY) < 0) {
+						if (elementIsLess_(eX, eY)) {
 							return -1;
 						};
 						return 1;
@@ -256,7 +263,7 @@ namespace XYO::Encoding {
 					eY = elementToLowerCaseASCII(*y);
 
 					if (eX != eY) {
-						if ((eX - eY) < 0) {
+						if (elementIsLess_(eX, eY)) {
 							return -1;
 						};
 						return 1;
@@ -323,6 +330,7 @@ namespace XYO::Encoding {
 					for (m = y; *m; ++m) {
 						if (*x == *m) {
 							found = true;
+							break;
 						}
 					};
 					if (!found) {
@@ -340,6 +348,9 @@ namespace XYO::Encoding {
 				size_t k;
 				bool found;
 				k = length(x);
+				if (k == 0) {
+					return x;
+				};
 				xIndex = x + k;
 				xIndex2 = xIndex;
 				--xIndex;
@@ -348,6 +359,7 @@ namespace XYO::Encoding {
 					for (m = y; *m; ++m) {
 						if (*xIndex == *m) {
 							found = true;
+							break;
 						}
 					};
 					if (!found) {

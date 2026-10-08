@@ -29,6 +29,10 @@ namespace XYO::Encoding {
 				return 'a' + (x - 10);
 			};
 
+			static inline bool isValid(const T x) {
+				return ((x >= '0') && (x <= '9')) || ((x >= 'A') && (x <= 'F')) || ((x >= 'a') && (x <= 'f'));
+			};
+
 			static inline typename std::make_unsigned<T>::type decode(const T x) {
 				if (x >= '0' && x <= '9') {
 					return (x & 0x0F);

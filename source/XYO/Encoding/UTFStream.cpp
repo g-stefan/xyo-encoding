@@ -54,7 +54,7 @@ namespace XYO::Encoding {
 					if (!UTF::elementUTF32FromUTF16(&utf32Data, &utf16Data[0])) {
 						return readLn;
 					};
-					size = UTF::elementUTF8FromUTF32(&utf8Input[0], utf32Data);
+					size = static_cast<int>(UTF::elementUTF8FromUTF32(&utf8Input[0], utf32Data));
 					utf8Input[size] = 0;
 				};
 				((char *)output)[readLn] = utf8Input[index];
@@ -76,7 +76,11 @@ namespace XYO::Encoding {
 					if (input->read(&utf32Data, sizeof(utf32)) != sizeof(utf32)) {
 						return readLn;
 					};
-					size = UTF::elementUTF8FromUTF32(&utf8Input[0], utf32Data);
+					size = static_cast<int>(UTF::elementUTF8FromUTF32(&utf8Input[0], utf32Data));
+					if (size == 0) {
+						// invalid code point, stop like the UTF16 mode does
+						return readLn;
+					};
 					utf8Input[size] = 0;
 				};
 				((char *)output)[readLn] = utf8Input[index];
@@ -98,6 +102,24 @@ namespace XYO::Encoding {
 
 	void UTF8Read::close() {
 		input.deleteMemory();
+	};
+
+	// Buffer one byte of an UTF8 sequence, false if it can not continue or start one.
+	// The byte is not consumed and the state is reset, so the next write starts clean.
+	static inline bool utf8WriteBuffer_(char x, char *buffer, int &index, int &size) {
+		if (index == 0) {
+			size = static_cast<int>(UTF8Core::elementSize(x));
+			if (size == 0) {
+				return false;
+			};
+		} else if (!UTF8Core::check(x)) {
+			index = 0;
+			size = 0;
+			return false;
+		};
+		buffer[index] = x;
+		index++;
+		return true;
 	};
 
 	UTF8Write::UTF8Write() {
@@ -125,14 +147,14 @@ namespace XYO::Encoding {
 		case UTFStreamMode::UTF16: {
 			size_t writeLn = 0;
 			while (length > 0) {
-				if (index == 0) {
-					size = UTF8Core::elementSize(((char *)input)[writeLn]);
+				if (!utf8WriteBuffer_(((const char *)input)[writeLn], utf8Output, index, size)) {
+					return writeLn;
 				};
-				utf8Output[index] = ((char *)input)[writeLn];
-				index++;
 				writeLn++;
 				--length;
 				if (index >= size) {
+					index = 0;
+					size = 0;
 					utf32 utf32Data;
 					size_t convertLn = 0;
 					convertLn = UTF::elementUTF32FromUTF8(&utf32Data, &utf8Output[0]);
@@ -147,8 +169,6 @@ namespace XYO::Encoding {
 					if (output->write(&utf16Data[0], sizeof(utf16) * convertLn) != sizeof(utf16) * convertLn) {
 						return writeLn;
 					};
-					index = 0;
-					size = 0;
 				};
 			};
 			return writeLn;
@@ -156,14 +176,14 @@ namespace XYO::Encoding {
 		case UTFStreamMode::UTF32: {
 			size_t writeLn = 0;
 			while (length > 0) {
-				if (index == 0) {
-					size = UTF8Core::elementSize(((char *)input)[writeLn]);
+				if (!utf8WriteBuffer_(((const char *)input)[writeLn], utf8Output, index, size)) {
+					return writeLn;
 				};
-				utf8Output[index] = ((char *)input)[writeLn];
-				index++;
 				writeLn++;
 				--length;
 				if (index >= size) {
+					index = 0;
+					size = 0;
 					utf32 utf32Data;
 					size_t convertLn = 0;
 					convertLn = UTF::elementUTF32FromUTF8(&utf32Data, &utf8Output[0]);
@@ -173,8 +193,6 @@ namespace XYO::Encoding {
 					if (output->write(&utf32Data, sizeof(utf32Data) * convertLn) != sizeof(utf32Data) * convertLn) {
 						return writeLn;
 					};
-					index = 0;
-					size = 0;
 				};
 			};
 			return writeLn;

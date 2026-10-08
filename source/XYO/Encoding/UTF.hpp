@@ -62,6 +62,8 @@ namespace XYO::Encoding {
 		XYO_ENCODING_EXPORT StringUTF32 utf32FromUTF8(const utf8 *in, const utf32 *err = utf32StringQuestionMark);
 		XYO_ENCODING_EXPORT StringUTF32 utf32FromUTF16(const utf16 *in, const utf32 *err = utf32StringQuestionMark);
 
+		XYO_ENCODING_EXPORT size_t utf8FromUTF16Length(const utf16 *in, const utf8 *err = utf8StringQuestionMark);
+		XYO_ENCODING_EXPORT size_t utf8FromUTF32Length(const utf32 *in, const utf8 *err = utf8StringQuestionMark);
 		XYO_ENCODING_EXPORT size_t utf16FromUTF8Length(const utf8 *in, const utf16 *err = utf16StringQuestionMark);
 		XYO_ENCODING_EXPORT size_t utf16FromUTF32Length(const utf32 *in, const utf16 *err = utf16StringQuestionMark);
 		XYO_ENCODING_EXPORT size_t utf32FromUTF8Length(const utf8 *in, const utf32 *err = utf32StringQuestionMark);

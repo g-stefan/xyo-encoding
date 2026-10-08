@@ -4,8 +4,8 @@
 // SPDX-FileCopyrightText: 2016-2026 Grigore Stefan <g_stefan@yahoo.com>
 // SPDX-License-Identifier: MIT
 
-#ifndef XYO_ENCODING_UTF15CORE_HPP
-#define XYO_ENCODING_UTF15CORE_HPP
+#ifndef XYO_ENCODING_UTF16CORE_HPP
+#define XYO_ENCODING_UTF16CORE_HPP
 
 #ifndef XYO_ENCODING_DEPENDENCY_HPP
 #	include <XYO/Encoding/Dependency.hpp>

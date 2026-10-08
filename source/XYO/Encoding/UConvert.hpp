@@ -13,20 +13,27 @@
 
 namespace XYO::Encoding::UConvert {
 
+	// Masked shift counts, shifting by the full width (c == 0) is undefined behavior.
+	// Compilers still emit a single rotate instruction for this form.
+
 	inline uint32_t u32LeftRotate(uint32_t x, uint16_t c) {
-		return (x << c) | (x >> (32 - c));
+		c &= 31;
+		return (x << c) | (x >> ((32 - c) & 31));
 	};
 
 	inline uint32_t u32RightRotate(uint32_t x, uint16_t c) {
-		return (x >> c) | (x << (32 - c));
+		c &= 31;
+		return (x >> c) | (x << ((32 - c) & 31));
 	};
 
 	inline uint64_t u64LeftRotate(uint64_t x, uint16_t c) {
-		return (x << c) | (x >> (64 - c));
+		c &= 63;
+		return (x << c) | (x >> ((64 - c) & 63));
 	};
 
 	inline uint64_t u64RightRotate(uint64_t x, uint16_t c) {
-		return (x >> c) | (x << (64 - c));
+		c &= 63;
+		return (x >> c) | (x << ((64 - c) & 63));
 	};
 
 	inline uint32_t u32FromU8(const uint8_t *in) {
